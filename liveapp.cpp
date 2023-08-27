@@ -1,15 +1,16 @@
-#include <iostream>
-#include <map>
-#include <vector>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+// #include <iostream>
+// #include <map>
+// #include <vector>
+// #include <stdio.h>
+// #include <string.h>
+// #include <stdlib.h>
+#include<bits/stdc++.h>
 using namespace std;
 
 void page1();
 void page2(string);
 
-char *waiting;
+// char *waiting;
 
 map<string, string> user;
 
@@ -25,9 +26,9 @@ class frnd
     };
 
 public:
-    map<string, chat> sms;
+    map<string, chat> sms;   
     void addfrnd(string);
-    void unfrnd(string);
+    void unfrnd();
     void dispfrnd(string);
     void chat_on(string, string, char *);
     void inbox(string);
@@ -35,24 +36,6 @@ public:
 
 void frnd::chat_on(string uname, string reciepient, char *message)
 {
-    int flag = 0;
-    sms[reciepient].sender = uname;
-    sms[reciepient].receiver = reciepient;
-    map<string, string>::iterator iuser;
-    for (iuser = user.begin(); iuser != user.end(); iuser++)
-    {
-        if (iuser->first == reciepient)
-        {
-            flag++;
-            break;
-        }
-    }
-    if (!flag)
-    {
-        cout << "\nSorry!! No user found\a\a\n";
-        page2(uname);
-    }
-
     int i;
     char cuname[20];
     for (i = 0; uname[i] != '\0'; i++)
@@ -83,17 +66,18 @@ void frnd::addfrnd(string uname)
 {
     vector<string>::iterator iv;
     map<string, string>::iterator iuser;
-    int uflag = 0, flag = 0, flag3 = 0;
+    int flag = 0, flag3 = 0;
 A:
     string addname;
     cout << "\nEnter the name which you want to add in your friend list:- ";
     cin >> addname;
-    cout << "\nPlease wait! checking for  " << addname << "......\n";
-    // waiting time for new mwssage
-    for (int i = 0; i < 99999910;)
-    {
-        i++;
-    }
+    // cout << "\nPlease wait! checking for  " << addname << "......\n";
+    
+    if(addname==uname)
+       {
+        cout << "\nSorry! Can't add yourself to your friend list\n";
+        goto A;
+       }
     for (iuser = user.begin(); iuser != user.end(); iuser++)
     {
         for (iv = flist.begin(); iv != flist.end(); iv++)
@@ -101,30 +85,17 @@ A:
             if (*iv == addname)
                 flag3++;
         }
-        if (addname == uname)
-        {
-
-            uflag++;
-            break;
-        }
-
-        else if (iuser->first == addname)
+         if (iuser->first == addname)
             flag++;
     }
-
-    if (uflag == 1 && flag == 0 && flag3 == 0)
-    {
-        cout << "\nSorry! Can't add yourself to your friend list\n";
-        goto A;
-    }
-    if (flag == 1 && uflag == 0 && flag3 == 0)
+    if (flag == 1  && flag3 == 0)
     {
         cout << "\nFound\t" << addname << endl;
         flist.push_back(addname);
         cout << "\nCongratulations! " << addname << " has been added to your friend list\n"
              << endl;
     }
-    else if (uflag == 0 && flag == 0)
+    else if (flag == 0)
     {
         cout << "\nSorry!! this username does not exist\n";
     }
@@ -151,7 +122,7 @@ void frnd::dispfrnd(string uname)
          << "\nTotal friends: " << --c;
 }
 
-void frnd::unfrnd(string uname)
+void frnd::unfrnd()
 {
     if (flist.empty())
     {
@@ -225,16 +196,20 @@ void page1()
             }
             else
             {
+                int flag0=0;
                 map<string, string>::iterator iuser;
                 for (iuser = user.begin(); iuser != user.end(); iuser++)
                 {
                     if (iuser->first == username)
                     {
                         cout << "\nSorry! username already available..please try with some other name\n";
+                        flag0=1;
                         break;
                     }
                 }
-                user[username] = pwd;
+                if(flag0==0)
+                 user[username] = pwd;
+                  
             }
             break;
         }
@@ -282,10 +257,15 @@ void page1()
             count = 1;
             break;
         }
-
+        case 4:
+           {
+            exit(0);
+           }
         default:
         {
-            exit(0);
+            // exit(0);
+            cout<<"You Entered Wrong Choice\n";
+            break;
         }
         }
 
@@ -297,7 +277,7 @@ void page1()
 }
 
 map<string, frnd> f;
-
+ 
 void page2(string uname)
 {
 
@@ -345,6 +325,25 @@ main_menu:
         string reciepient;
         cout << "\nPlease enter the reciepient's name:\n";
         cin >> reciepient;
+        if(reciepient==uname)
+           {
+            cout<<"You can't sent message to yourself\n";
+            goto main_menu;
+           }
+           int c=0;
+         for(auto p:user)
+           {
+            if(p.first==reciepient)
+                 {
+                    c++;
+                    break;
+                 }
+           }
+           if(c==0)
+              {
+                cout<<"User "<<reciepient<<" is not exists\n";
+                goto main_menu;
+              }
         char message[100];
         cout << "\nPlease Type Your message :" << endl;
         cin.ignore();
@@ -378,7 +377,7 @@ main_menu:
     }
     case 5:
     {
-        f[uname].unfrnd(uname);
+        f[uname].unfrnd();
         cout << "\npress any number except '0' to go back to main menu\n";
         cin >> choice3;
         if (choice3)
@@ -399,7 +398,11 @@ main_menu:
         string reciepient;
         cout << "Enter reciepient";
         cin >> reciepient;
-
+        if(reciepient==uname)
+          {
+            cout<<"You can't Broadcast YourSelf\n";
+            goto group;
+          }
         for (iuser = user.begin(); iuser != user.end(); iuser++)
         {
             if (iuser->first == reciepient)
@@ -412,8 +415,7 @@ main_menu:
         {
             cout << "\nSorry!! No such user exist\a\a\n";
             goto group;
-        }
-
+        }   
         rec.push_back(reciepient);
         cout << "Do you want to add more reciepients (y/n)?\n";
         cin >> ch;
